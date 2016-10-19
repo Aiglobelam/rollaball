@@ -7,14 +7,27 @@ public class PlayerController : MonoBehaviour {
 	// Then we can make all our changes to this var in the editor instead of in the script.
 	// This saves us from recompiling the script all the time we want to update this value.
 	public float speed;
+	public float jumpforce;
+	private float distanceToGround;
 
 	private Rigidbody rb;
+	private Collider playerCollider;
+
+	bool isGrounded(){
+		return Physics.Raycast (this.transform.position, -Vector3.up, distanceToGround + 0, 1);
+	}
+
 	// Start is called in the first frame of which this very Script (PlayerController.cs) is ACTIVE
 	// That is the very first FRAME of the game.
 	void Start(){
 		// This will find and return a refference to a RigidBody if it exist one on the Game Object
 		// That this very Script (PlayerController.cs) is attached to.
 		rb = GetComponent<Rigidbody> ();
+		playerCollider = GetComponent<Collider> ();
+		distanceToGround = playerCollider.bounds.extents.y;
+		print ("distanceToGround: " + distanceToGround);
+		print (transform.position);
+		print (isGrounded ());
 	}
 
 	// We want to check every frame for player input
@@ -23,23 +36,38 @@ public class PlayerController : MonoBehaviour {
 
 	// Update is called before rendering a frame, and this is where our gamecode will go
 	void Update(){
-		
+		//print ("x:"+rb.velocity.x+", y:"+rb.velocity.y+" z:"+rb.velocity.z);
+
+		if (Input.GetKeyDown ("space")) {
+			print ("space key was pressed");
+			print ("isGrounded: " + isGrounded());
+		}
+
+		if (Input.GetKeyDown("space") && isGrounded()) {
+			rb.AddForce(Vector3.up * jumpforce);
+
+		}
 	}
 
 	// Invoked just before performing any physics calculation, this is where our physics code will go
 	// We will move the ball by applying forces to the "RigidBody"
 	void FixedUpdate(){
-		// The Horizontal and Vertical "axis" is controlled by the arrow keys on keyboard.
-		// Our "Player" Object (the ball) has a "Rigidbody" and interacts with the PhysEngine
-		float moveHorizontal = Input.GetAxis("Horizontal");
-		float moveVertical = Input.GetAxis ("Vertical");
-		// We will use these inputs to add forces to the "RigidBody" and move the Player Object in the Scene
 
-		// There exist diffrent ways of accessing onother Component on a Game object "Player" in this case.
-		// We use the rb reference we created in Start()
-		Vector3 movement = new Vector3 (moveHorizontal, 0, moveVertical);
+		if (isGrounded()) {
+			// The Horizontal and Vertical "axis" is controlled by the arrow keys on keyboard.
+			// Our "Player" Object (the ball) has a "Rigidbody" and interacts with the PhysEngine
+			float moveHorizontal = Input.GetAxis("Horizontal");
+			float moveVertical = Input.GetAxis ("Vertical");
 
-		rb.AddForce(movement * speed);
+			// We will use these inputs to add forces to the "RigidBody" and move the Player Object in the Scene
+
+			// There exist diffrent ways of accessing onother Component on a Game object "Player" in this case.
+			// We use the rb reference we created in Start()
+			Vector3 movement = new Vector3 (moveHorizontal, 0, moveVertical);
+
+			rb.AddForce(movement * speed);
+		}
+	
 	}
 
 	/** https://unity3d.com/learn/tutorials/projects/roll-ball-tutorial/collecting-pick-objects?playlist=17141
