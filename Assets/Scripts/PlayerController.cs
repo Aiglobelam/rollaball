@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
 
@@ -12,6 +13,10 @@ public class PlayerController : MonoBehaviour {
 
 	private Rigidbody rb;
 	private Collider playerCollider;
+
+	public Text countText;
+	public Text winText;
+	private int count;
 
 	bool isGrounded(){
 		return Physics.Raycast (this.transform.position, -Vector3.up, distanceToGround + 0, 1);
@@ -28,6 +33,9 @@ public class PlayerController : MonoBehaviour {
 		print ("distanceToGround: " + distanceToGround);
 		print (transform.position);
 		print (isGrounded ());
+		count = 0;
+		SetCountText ();
+		winText.text = "";
 	}
 
 	// We want to check every frame for player input
@@ -121,6 +129,15 @@ public class PlayerController : MonoBehaviour {
 		// TAG "Pick up" has to be defined un Unity, DUH
 		if(other.gameObject.CompareTag("Pick Up")) {
 			other.gameObject.SetActive(false);
+			count++;
+			SetCountText ();
+		}
+	}
+
+	void SetCountText(){
+		countText.text = "Count: " + count.ToString();
+		if (count >= 12) {
+			this.winText.text = "YOU WIN";
 		}
 	}
 }
